@@ -1,0 +1,31 @@
+services:
+  postgres-helm-cm:
+    image: postgres:latest
+    container_name: postgres-helm-cm
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: helm_cm
+    volumes:
+      - pg_helm_cm:/var/lib/postgresql/data
+#      - ./docker/pg/pg_orders/init_helm_cm.sql:/docker-entrypoint-initdb.d/init_helm_cm.sql
+
+  demo-helm-cm-app:
+    image: demo-helm-cm-app
+    container_name: demo-helm-cm-app
+    build:
+      context: ../
+      dockerfile: ./02-helm-cm-full-properties/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres-helm-cm
+
+volumes:
+  pg_helm_cm:
+
+networks:
+  default:
+    name: helm-cm-network
